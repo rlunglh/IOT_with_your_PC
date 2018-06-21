@@ -1,6 +1,9 @@
 float oldRGB[3], RGB[3], delta[3];
 void setup()
 {
+// set PWM parameters
+analogWriteFreq(100);
+analogWriteRange(1023);
 // set D1,D2,D3 to OUTPUT mode
    pinMode(D1,OUTPUT); 
    pinMode(D2,OUTPUT);
