@@ -4,4 +4,4 @@ Support files for the IOT with your PC book
 All examples are for ESP8266 Processor as
 a WiFi peripheral to the PC
 
-Wiring examples assume use of a Wemos Mini D1
+Wiring examples assume use of a Wemos D1 mini
