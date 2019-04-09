@@ -1,18 +1,16 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
-
-#include <credentials.h>
+//const char* ssid = "........";
+//const char* password = "........";
+#include "credentials.h"
 
 ESP8266WebServer server(80);
 
 const int led = LED_BUILTIN;
 
 void handleRoot() {
-  digitalWrite(led, 0);
   server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(led, 1);
 }
 int pwmFreq=100;
 int pwmRange=32767;
@@ -39,7 +37,10 @@ void digitalCommand() {
   // Send feedback to client
     msg="Pin D";
     msg=msg+pins;
-    msg=msg+" is equal to ";
+    if (nparts!=3)
+      msg=msg+" is equal to ";
+    else
+      msg=msg+" is set to ";
     msg=msg+value;
     server.send(200, "text/plain", msg);
 }
@@ -188,17 +189,21 @@ void handleNotFound()
 { 
   process(); 
 }
+
+IPAddress ip(192, 168, 0, 177); 
+IPAddress dns(8,8,8,8); 
+IPAddress gway(192, 168, 0, 1); 
 void setup(void){
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
+  WiFi.config(ip,dns,gway);
   WiFi.begin(ssid, password);
   Serial.println("");
-
   analogWriteFreq(pwmFreq);
   analogWriteRange(pwmRange);
-
+  pwmFreq=102;
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -207,21 +212,11 @@ void setup(void){
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
-
   server.on("/", handleRoot);
-
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
-
   server.onNotFound(handleNotFound);
-
   server.begin();
   Serial.println("HTTP server started");
 }
